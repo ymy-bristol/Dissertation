@@ -30,4 +30,13 @@ def split_data(path):
 
     return x_train, x_test, y_train, y_test
 
+def print_best_score(clf,parameters):
+    # 输出best score
+    print("Best score: %0.3f" % clf.best_score_)
+    print("Best parameters set:")
+    # 输出最佳的分类器到底使用了怎样的参数
+    best_parameters = clf.best_estimator_.get_params()
+    for param_name in sorted(parameters.keys()):
+        print("\t%s: %r" % (param_name, best_parameters[param_name]))
+
 # x_train, x_test, y_train, y_test = split_data(path)
