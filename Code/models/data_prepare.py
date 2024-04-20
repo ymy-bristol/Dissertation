@@ -2,10 +2,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_validate
 
 # path = 'E:\PersonalFiles\杂项\Dissertation\Data/diabetes_data.csv'
 
+# preprocess data
 def preprocess(path):
     with open(path, 'r') as f:
         df = pd.read_csv(path)
@@ -19,6 +20,8 @@ def preprocess(path):
 
     return df, df_positive, df_negative
 
+
+# train test split
 def split_data(path):
     _, df_positive, df_negative = preprocess(path)
 
@@ -30,6 +33,8 @@ def split_data(path):
 
     return x_train, x_test, y_train, y_test
 
+
+# print the best score
 def print_best_score(clf,parameters):
     # 输出best score
     print("Best score: %0.3f" % clf.best_score_)
@@ -39,4 +44,14 @@ def print_best_score(clf,parameters):
     for param_name in sorted(parameters.keys()):
         print("\t%s: %r" % (param_name, best_parameters[param_name]))
 
-# x_train, x_test, y_train, y_test = split_data(path)
+
+# cross validation for basic models
+def cross_val(clf, x, y):
+    scoring = ['precision_macro', 'recall_macro', 'f1_macro']
+    scores = cross_validate(clf, x, y, scoring=scoring, cv=5, n_jobs=-1)
+    print('baisc model results:')
+    print('\taverage fit time: ', scores['fit_time'].mean())
+    print('\taverage score time: ', scores['score_time'].mean())
+    print('\taverage precision: ', scores['test_precision_macro'].mean())
+    print('\taverage recall: ', scores['test_recall_macro'].mean())
+    print('\taverage f1: ', scores['test_f1_macro'].mean())
