@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn
 from sklearn.model_selection import train_test_split, cross_validate
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 # path = 'E:\PersonalFiles\杂项\Dissertation\Data/diabetes_data.csv'
 
@@ -34,7 +35,7 @@ def split_data(path):
     return x_train, x_test, y_train, y_test
 
 
-# print the best score
+# print the best score, 使用GridSearchCV函数的用这个
 def print_best_score(clf,parameters):
     # 输出best score
     print("Best score: %0.3f" % clf.best_score_)
@@ -45,13 +46,26 @@ def print_best_score(clf,parameters):
         print("\t%s: %r" % (param_name, best_parameters[param_name]))
 
 
-# cross validation for basic models
-def cross_val(clf, x, y):
+# cross validation for basic models，直接使用交叉验证函数的用这个
+def cross_val(clf, x_train, y_train, x_test, y_test):
     scoring = ['precision_macro', 'recall_macro', 'f1_macro']
-    scores = cross_validate(clf, x, y, scoring=scoring, cv=5, n_jobs=-1)
-    print('baisc model results:')
-    print('\taverage fit time: ', scores['fit_time'].mean())
-    print('\taverage score time: ', scores['score_time'].mean())
-    print('\taverage precision: ', scores['test_precision_macro'].mean())
-    print('\taverage recall: ', scores['test_recall_macro'].mean())
-    print('\taverage f1: ', scores['test_f1_macro'].mean())
+    scores = cross_validate(clf, x_train, y_train, scoring=scoring, cv=5, n_jobs=-1)
+
+    # testing set:
+    clf = clf.fit(x_train, y_train)
+    y_pred = clf.predict(x_test)
+    precision = precision_score(y_test, y_pred)
+    recall    = recall_score(y_test, y_pred)
+    f1        = f1_score(y_test, y_pred)
+    
+    print('training set results:')
+    print('\taverage fit time: %.5f' % scores['fit_time'].mean())
+    print('\taverage inference time: %.5f' % scores['score_time'].mean())
+    print('\taverage precision: %.2f' % (scores['test_precision_macro'].mean()*100))
+    print('\taverage recall: %.2f' % (scores['test_recall_macro'].mean()*100))
+    print('\taverage f1: %.2f' % (scores['test_f1_macro'].mean()*100))
+
+    print('testing set results:')
+    print('\tprecision: %.2f' % (precision*100))
+    print('\trecall: %.2f' % (recall*100))
+    print('\tf1: %.2f' % (f1*100))
