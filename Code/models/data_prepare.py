@@ -36,14 +36,27 @@ def split_data(path):
 
 
 # print the best score, 使用GridSearchCV函数的用这个
-def print_best_score(clf,parameters):
-    # 输出best score
-    print("Best score: %0.3f" % clf.best_score_)
-    print("Best parameters set:")
+def print_best_score(clf, parameters, x_train, y_train, x_test, y_test):
+    clf = clf.fit(x_train, y_train)
     # 输出最佳的分类器到底使用了怎样的参数
     best_parameters = clf.best_estimator_.get_params()
+    print('best params:')
     for param_name in sorted(parameters.keys()):
         print("\t%s: %r" % (param_name, best_parameters[param_name]))
+
+    clf = clf.fit(x_train, y_train)
+    y_pred_train = clf.predict(x_train)
+    y_pred = clf.predict(x_test)
+
+    print('training set results:')
+    print('\tprecision: %.2f' % (precision_score(y_train, y_pred_train)*100))
+    print('\trecall: %.2f' % (recall_score(y_train, y_pred_train)*100))
+    print('\tf1: %.2f' % (f1_score(y_train, y_pred_train)*100))
+
+    print('testing set results:')
+    print('\tprecision: %.2f' % (precision_score(y_test, y_pred)*100))
+    print('\trecall: %.2f' % (recall_score(y_test, y_pred)*100))
+    print('\tf1: %.2f' % (f1_score(y_test, y_pred)*100))
 
 
 # cross validation for basic models，直接使用交叉验证函数的用这个
