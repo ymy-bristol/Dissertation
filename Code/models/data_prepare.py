@@ -44,7 +44,6 @@ def print_best_score(clf, parameters, x_train, y_train, x_test, y_test):
     for param_name in sorted(parameters.keys()):
         print("\t%s: %r" % (param_name, best_parameters[param_name]))
 
-    clf = clf.fit(x_train, y_train)
     y_pred_train = clf.predict(x_train)
     y_pred = clf.predict(x_test)
 
